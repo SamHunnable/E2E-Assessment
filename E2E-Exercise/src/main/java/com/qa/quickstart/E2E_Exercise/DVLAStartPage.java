@@ -7,14 +7,16 @@ import org.openqa.selenium.support.FindBy;
 
 public class DVLAStartPage {
 		
-		@FindBy(id = "get-started") private WebElement licenseSearch;
-		@FindBy(id = "Vrm") private WebElement startButton; 
+		
+		//@FindBy(id = "Vrm") private WebElement startButton; 
+		@FindBy(xpath = "//*[@id=\"get-started\"]/a") private WebElement startButton; 
+		
 		
 
 	public void registrationSearch(WebDriver driver, Actions action) {
-		driver.get(Constants.DVLAStartPage);
+		//driver.get(Constants.DVLAStartPage);
 		startButton.click();
-		action.click(licenseSearch).sendKeys("G607 DAN").perform();
+		
 			
 	}
 	
