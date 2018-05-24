@@ -54,7 +54,7 @@ public class WebTest {
 		System.out.println(licensePlate);
 		
 		DVLAStartPage startPage = PageFactory.initElements(driver, DVLAStartPage.class);
-		startPage.registrationSearch(driver, action);
+		startPage.goToSearch(action);
 		Thread.sleep(5000);
 		DVLASearchPage searchPage = PageFactory.initElements(driver, DVLASearchPage.class);
 		searchPage.searchPlates(driver, licensePlate);

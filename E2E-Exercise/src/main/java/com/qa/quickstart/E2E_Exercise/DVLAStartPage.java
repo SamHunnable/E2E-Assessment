@@ -13,9 +13,8 @@ public class DVLAStartPage {
 		
 		
 
-	public void registrationSearch(WebDriver driver, Actions action) {
-		//driver.get(Constants.DVLAStartPage);
-		startButton.click();
+	public void goToSearch(Actions action) {
+		action.click(startButton).perform();
 		
 			
 	}
