@@ -1,6 +1,5 @@
 package com.qa.quickstart.E2E_Exercise;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -15,8 +14,7 @@ public class DVLAStartPage {
 
 	public void goToSearch(Actions action) {
 		action.click(startButton).perform();
-		
-			
+				
 	}
 	
 

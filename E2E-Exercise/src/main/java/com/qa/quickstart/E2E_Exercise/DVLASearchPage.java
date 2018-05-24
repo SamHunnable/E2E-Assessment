@@ -7,15 +7,15 @@ import org.openqa.selenium.support.FindBy;
 
 public class DVLASearchPage {
 
-	//@FindBy(id = "Vrm") private WebElement licenseSearch;
-	@FindBy(xpath = "//*[@id=\"Vrm\"]") private WebElement licenseSearch;
+	@FindBy(id = "Vrm") private WebElement licenseSearch;
+	//@FindBy(xpath = "//*[@id=\"Vrm\"]") private WebElement licenseSearch;
 	@FindBy(name = "Continue") private WebElement next;
 	
 	
 	
-	public void searchPlates(WebDriver driver, String licensePlate) {
+	public void searchPlates(WebDriver driver, String licensePlate) throws InterruptedException {
 		Actions action = new Actions(driver);
-		
+		Thread.sleep(3000);
 		action.click(licenseSearch).sendKeys(licensePlate).click(next).perform();
 	
 	}
