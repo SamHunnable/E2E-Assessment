@@ -13,10 +13,10 @@ public class DVLASearchPage {
 	
 	
 	
-	public void searchPlates(WebDriver driver) {
+	public void searchPlates(WebDriver driver, String licensePlate) {
 		Actions action = new Actions(driver);
 		
-		action.click(licenseSearch).sendKeys("G607 DAN").click(next).perform();
+		action.click(licenseSearch).sendKeys(licensePlate).click(next).perform();
 	
 	}
 	
