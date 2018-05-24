@@ -93,7 +93,7 @@ public class ExcelUtils {
 
 			// Constant variables Test Data path and Test Data file name
 
-			FileOutputStream fileOut = new FileOutputStream("Path to file");
+			FileOutputStream fileOut = new FileOutputStream(Constants.pathToFile);
 
 			ExcelWBook.write(fileOut);
 

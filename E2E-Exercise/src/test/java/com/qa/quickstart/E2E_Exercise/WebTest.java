@@ -35,9 +35,9 @@ public class WebTest {
 
 	@Before
 	public void setup() throws IOException {
-		System.setProperty("webdriver.chrome.driver", "C:\\Users\\Admin\\WebDrivers\\chromedriver.exe");
+		System.setProperty("webdriver.chrome.driver", Constants.pathToWebDriver);
 		driver = new ChromeDriver();
-		Actions action = new Actions(driver);
+		action = new Actions(driver);
 		ExcelUtils.setExcelFile(Constants.pathToFile, 0);
 		file = new FileInputStream(Constants.pathToFile);
 		workbook = new XSSFWorkbook(file);
@@ -54,7 +54,7 @@ public class WebTest {
 		System.out.println(licensePlate);
 		
 		DVLAStartPage startPage = PageFactory.initElements(driver, DVLAStartPage.class);
-		startPage.registrationSearch(driver, action);
+		startPage.goToSearch(action);
 		Thread.sleep(5000);
 		DVLASearchPage searchPage = PageFactory.initElements(driver, DVLASearchPage.class);
 		searchPage.searchPlates(driver, licensePlate);
