@@ -10,7 +10,7 @@ public class ResultPage {
 	
 	
 	public String getMake() throws InterruptedException {
-		Thread.sleep(1500);
+		Thread.sleep(3000);
 		return make.getText();
 	}
 	

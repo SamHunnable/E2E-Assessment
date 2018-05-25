@@ -10,14 +10,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
@@ -42,7 +39,7 @@ public class Testing {
 	ExtentReports extent;
 	ExtentTest test;
 	TimeUnit tu=TimeUnit.SECONDS; 
-	Wait<WebDriver> wait; 
+	WebDriverWait wait; 
 	
 	@Before
 	private void setup() throws IOException {
@@ -56,7 +53,6 @@ public class Testing {
 		test = extent.startTest("License Plate testing");
 		test.log(LogStatus.INFO, "Scenario begins");
 		
-		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 		//wait = new FluentWait<WebDriver>(driver).withTimeout(10, tu).pollingEvery(1, tu).ignoring(NoSuchElementException.class);
 		
 		System.out.println("Before ran");		
@@ -73,8 +69,8 @@ public class Testing {
 		System.setProperty("webdriver.chrome.driver", Constants.pathToWebDriver);
 		driver = new ChromeDriver();
 		action = new Actions(driver);
+		wait = new WebDriverWait(driver,10);
 		
-		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 		//wait = new FluentWait<WebDriver>(driver).withTimeout(10, tu).pollingEvery(1, tu).ignoring(NoSuchElementException.class);
 
 		ExcelUtils.setExcelFile(Constants.pathToFile, 0);
@@ -97,6 +93,7 @@ public class Testing {
 		else {
 			test.log(LogStatus.FAIL, "Not on start page");
 		}
+		ScreenshotUtility.screenshot(driver);
 	}
 	
 	
@@ -123,6 +120,7 @@ public class Testing {
 				resultPage = PageFactory.initElements(driver, ResultPage.class);
 			}
 				
+			ScreenshotUtility.screenshot(driver);
 			
 			plate = sheet.getRow(i).getCell(1);			
 			String make= plate.getStringCellValue(); 	
