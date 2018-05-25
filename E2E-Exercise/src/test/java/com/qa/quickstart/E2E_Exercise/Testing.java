@@ -10,16 +10,11 @@ import java.util.concurrent.TimeUnit;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
@@ -44,14 +39,22 @@ public class Testing {
 	ExtentReports extent;
 	ExtentTest test;
 	TimeUnit tu=TimeUnit.SECONDS; 
-	//Wait<WebDriver> wait = new FluentWait<WebDriver>(driver).withTimeout(10, tu).pollingEvery(1, tu).ignoring(NoSuchElementException.class);
+	WebDriverWait wait; 
 	
 	@Before
 	private void setup() throws IOException {
 		System.setProperty("webdriver.chrome.driver", Constants.pathToWebDriver);
 		driver = new ChromeDriver();
 		action = new Actions(driver);
+		
 		ExcelUtils.setExcelFile(Constants.pathToFile, 0);
+		
+		extent = new ExtentReports(Constants.pathToReport, true);
+		test = extent.startTest("License Plate testing");
+		test.log(LogStatus.INFO, "Scenario begins");
+		
+		//wait = new FluentWait<WebDriver>(driver).withTimeout(10, tu).pollingEvery(1, tu).ignoring(NoSuchElementException.class);
+		
 		System.out.println("Before ran");		
 	}
 	
@@ -66,8 +69,9 @@ public class Testing {
 		System.setProperty("webdriver.chrome.driver", Constants.pathToWebDriver);
 		driver = new ChromeDriver();
 		action = new Actions(driver);
+		wait = new WebDriverWait(driver,10);
 		
-		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		//wait = new FluentWait<WebDriver>(driver).withTimeout(10, tu).pollingEvery(1, tu).ignoring(NoSuchElementException.class);
 
 		ExcelUtils.setExcelFile(Constants.pathToFile, 0);
 		ExcelUtils.setExcelFile(Constants.pathToFile, 0);
@@ -89,6 +93,7 @@ public class Testing {
 		else {
 			test.log(LogStatus.FAIL, "Not on start page");
 		}
+		ScreenshotUtility.screenshot(driver);
 	}
 	
 	
@@ -101,9 +106,10 @@ public class Testing {
 		Thread.sleep(3000);
 		DVLASearchPage searchPage = PageFactory.initElements(driver, DVLASearchPage.class);
 		
-		
+		test.log(LogStatus.INFO, "Getting first plate info");
 		for (int i=1 ; i < sheet.getPhysicalNumberOfRows() ; i++) {
-		//for (int i=0 ; i < 1 ; i++) {
+		//for (int i=1 ; i < 1 ; i++) {
+			test.log(LogStatus.INFO, "Getting another plate info");
 			plate = sheet.getRow(i).getCell(0);
 			licensePlate = plate.getStringCellValue();  
 			test.log(LogStatus.INFO, "Searching for license plate");
@@ -113,30 +119,18 @@ public class Testing {
 			if (resultPage == null) {
 				resultPage = PageFactory.initElements(driver, ResultPage.class);
 			}
-					
+				
+			ScreenshotUtility.screenshot(driver);
+			
 			plate = sheet.getRow(i).getCell(1);			
 			String make= plate.getStringCellValue(); 	
 					 
 			assertEquals(make, resultPage.getMake());
-			if (make.equals(resultPage.getMake())) {
-				test.log(LogStatus.PASS, "Model matches");
-			}
-			else {
-				test.log(LogStatus.FAIL, "Model does not match");
-			}
-					
+							
 			plate = sheet.getRow(i).getCell(2);
 			String colour= plate.getStringCellValue(); 
-					
-					
-					
+									
 			assertEquals(colour, resultPage.getColour());
-			if (colour.equals(resultPage.getColour())) {
-				test.log(LogStatus.PASS, "Colour matches");
-			}
-			else {
-				test.log(LogStatus.FAIL, "Colour does not match");
-			}
 			
 			ExcelUtils.setCellData(resultPage.getMake(), i, 4);
 			ExcelUtils.setCellData(resultPage.getColour(), i, 5);
@@ -151,7 +145,35 @@ public class Testing {
 	@Then("^I get the vehicle information and it matches with the file$")
 	public void i_get_the_vehicle_information() throws Throwable {
 		
-	
+		for (int i=1 ; i < sheet.getPhysicalNumberOfRows() ; i++) {
+										
+				plate = sheet.getRow(i).getCell(1);			
+				String make = plate.getStringCellValue();
+				plate = sheet.getRow(i).getCell(4);
+				String foundMake = plate.getStringCellValue();
+						 
+				assertEquals(make, foundMake);
+				if (make.equals(foundMake)) {
+					test.log(LogStatus.PASS, "Model matches");
+				}
+				else {
+					test.log(LogStatus.FAIL, "Model does not match");
+				}
+						
+				plate = sheet.getRow(i).getCell(2);
+				String colour= plate.getStringCellValue(); 
+				plate = sheet.getRow(i).getCell(5);
+				String foundColour = plate.getStringCellValue();
+						
+						
+				assertEquals(colour, foundColour);
+				if (colour.equals(foundColour)) {
+					test.log(LogStatus.PASS, "Colour matches");
+				}
+				else {
+					test.log(LogStatus.FAIL, "Colour does not match");
+				}
+		}
 			
 		driver.quit();
 		workbook.close();
@@ -164,6 +186,8 @@ public class Testing {
 	private void tearDown() throws IOException {
 		driver.quit();
 		workbook.close();
+		extent.endTest(test);
+		extent.flush();
 		System.out.println("After ran");
 	}
 	

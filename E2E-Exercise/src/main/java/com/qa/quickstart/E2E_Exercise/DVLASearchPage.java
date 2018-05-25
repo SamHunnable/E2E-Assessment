@@ -15,7 +15,7 @@ public class DVLASearchPage {
 	
 	public void searchPlates(WebDriver driver, String licensePlate) throws InterruptedException {
 		Actions action = new Actions(driver);
-		Thread.sleep(3000);
+		Thread.sleep(5000);
 		action.click(licenseSearch).sendKeys(licensePlate).click(next).perform();
 	
 	}
