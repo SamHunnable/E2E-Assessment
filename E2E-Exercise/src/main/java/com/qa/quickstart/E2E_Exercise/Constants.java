@@ -21,6 +21,4 @@ public class Constants {
 	//protected static final String pathToReport ="C:\\Users\\Sam Hunnable\\QA-Work\\E2E-Assessment\\DVLAReport.html";
 	
 	//protected static final String pathToWebDriver = "..\\..\\..\\..\\..\\..\\..\\..\\chromedriver.exe";
-	
-	
 }
