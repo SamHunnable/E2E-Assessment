@@ -10,10 +10,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.relevantcodes.extentreports.ExtentReports;
@@ -35,7 +37,7 @@ public class Testing {
 	XSSFWorkbook workbook;
 	FileInputStream file;
 	String licensePlate;
-	Cell plate;
+	Cell plate, cellValue;
 	ExtentReports extent;
 	ExtentTest test;
 	TimeUnit tu=TimeUnit.SECONDS; 
@@ -84,7 +86,7 @@ public class Testing {
 	@Given("^I am on the DVLA page$")
 	public void i_am_on_the_DVLA_page() throws Throwable {
 		driver.get(Constants.DVLAStartPage);
-		
+		new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"get-started\"]/a")));
 		String title = "Get vehicle information from DVLA - GOV.UK";
 		assertEquals(title, driver.getTitle());
 		if (title.equals(driver.getTitle())) {
@@ -100,43 +102,52 @@ public class Testing {
 	@When("^I enter the registration in the DVLA website$")
 	public void i_enter_the_registration_in_the_DVLA_website() throws Throwable {
 		
-		Thread.sleep(3000);
-		DVLAStartPage startPage = PageFactory.initElements(driver, DVLAStartPage.class);
+		
+		DVLAStartPage startPage = PageFactory.initElements(driver, DVLAStartPage.class);	
+		
 		startPage.goToSearch(action);
-		Thread.sleep(3000);
+		new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.id("Vrm")));
 		DVLASearchPage searchPage = PageFactory.initElements(driver, DVLASearchPage.class);
 		
 		test.log(LogStatus.INFO, "Getting first plate info");
+		ResultPage resultPage = null;
+		
 		for (int i=1 ; i < sheet.getPhysicalNumberOfRows() ; i++) {
 		//for (int i=1 ; i < 1 ; i++) {
 			test.log(LogStatus.INFO, "Getting another plate info");
 			plate = sheet.getRow(i).getCell(0);
 			licensePlate = plate.getStringCellValue();  
 			test.log(LogStatus.INFO, "Searching for license plate");
+			
+		
+			new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.id("Vrm")));
 			searchPage.searchPlates(driver, licensePlate);
 			
-			ResultPage resultPage = null;
+			new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"pr3\"]/div/ul/li[2]/span[2]/strong")));
 			if (resultPage == null) {
+				
 				resultPage = PageFactory.initElements(driver, ResultPage.class);
 			}
+			
+			
 				
 			ScreenshotUtility.screenshot(driver);
 			
 			plate = sheet.getRow(i).getCell(1);			
 			String make= plate.getStringCellValue(); 	
 					 
-			assertEquals(make, resultPage.getMake());
+			//assertEquals(make, resultPage.getMake());
 							
-			plate = sheet.getRow(i).getCell(2);
+			cellValue = sheet.getRow(i).getCell(2);
 			String colour= plate.getStringCellValue(); 
 									
-			assertEquals(colour, resultPage.getColour());
+			//assertEquals(colour, resultPage.getColour());
 			
 			ExcelUtils.setCellData(resultPage.getMake(), i, 4);
 			ExcelUtils.setCellData(resultPage.getColour(), i, 5);
 			
 			driver.get(Constants.DVLAStartPage);
-			Thread.sleep(1500);
+			new WebDriverWait(driver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"get-started\"]/a")));
 			startPage.goToSearch(action);
 		}
 	}
@@ -146,33 +157,32 @@ public class Testing {
 	public void i_get_the_vehicle_information() throws Throwable {
 		
 		for (int i=1 ; i < sheet.getPhysicalNumberOfRows() ; i++) {
-										
-				plate = sheet.getRow(i).getCell(1);			
-				String make = plate.getStringCellValue();
-				plate = sheet.getRow(i).getCell(4);
-				String foundMake = plate.getStringCellValue();
-						 
-				assertEquals(make, foundMake);
+			
+				//System.out.println(i);	
+						
+				String make = ExcelUtils.getCellData(i, 1);
+				String foundMake = ExcelUtils.getCellData(i, 4);
+				
 				if (make.equals(foundMake)) {
 					test.log(LogStatus.PASS, "Model matches");
 				}
 				else {
 					test.log(LogStatus.FAIL, "Model does not match");
 				}
+				assertEquals(make, foundMake);
+				
+				String colour= ExcelUtils.getCellData(i, 2);
+				String foundColour = ExcelUtils.getCellData(i, 5);
 						
-				plate = sheet.getRow(i).getCell(2);
-				String colour= plate.getStringCellValue(); 
-				plate = sheet.getRow(i).getCell(5);
-				String foundColour = plate.getStringCellValue();
 						
-						
-				assertEquals(colour, foundColour);
+				
 				if (colour.equals(foundColour)) {
 					test.log(LogStatus.PASS, "Colour matches");
 				}
 				else {
 					test.log(LogStatus.FAIL, "Colour does not match");
 				}
+				assertEquals(colour, foundColour);
 		}
 			
 		driver.quit();
